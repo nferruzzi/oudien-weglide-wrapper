@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -124,12 +125,14 @@ public class MainActivity extends Activity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 loadingFinished = false;
+                Toast.makeText(MainActivity.this, "Caricamento...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 loadingFinished = true;
+                Toast.makeText(MainActivity.this, "Caricato: " + url, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -168,6 +171,11 @@ public class MainActivity extends Activity {
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 Log.d("WeGlideCopilot", consoleMessage.message() + " -- line "
                     + consoleMessage.lineNumber() + " of " + consoleMessage.sourceId());
+                // Show errors as Toast
+                if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+                    Toast.makeText(MainActivity.this, "JS Error: " + consoleMessage.message(),
+                        Toast.LENGTH_LONG).show();
+                }
                 return true;
             }
         });
