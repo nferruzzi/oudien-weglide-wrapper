@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
@@ -30,9 +32,23 @@ jobs:
     - name: Build Debug APK
       run: gradle assembleDebug
 
-    - name: Upload APK
+    - name: Rename APK
+      run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/weglide-copilot.apk
+
+    - name: Upload APK as artifact
       uses: actions/upload-artifact@v4
       with:
         name: weglide-copilot-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/debug/weglide-copilot.apk
         retention-days: 30
+
+    - name: Create/Update Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: latest
+        name: Latest Build
+        body: |
+          APK aggiornato automaticamente ad ogni push.
+          Scarica `weglide-copilot.apk` qui sotto.
+        files: app/build/outputs/apk/debug/weglide-copilot.apk
+        prerelease: true
