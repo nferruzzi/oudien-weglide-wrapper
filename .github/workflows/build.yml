@@ -28,9 +28,11 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: 8.4
 
     - name: Build Debug APK
-      run: gradle assembleDebug
+      run: gradle assembleDebug --no-configuration-cache
 
     - name: Rename APK
       run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/weglide-copilot.apk
