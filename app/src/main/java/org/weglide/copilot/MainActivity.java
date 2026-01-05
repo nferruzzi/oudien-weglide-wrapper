@@ -17,9 +17,11 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.ConsoleMessage;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
@@ -64,6 +66,11 @@ public class MainActivity extends Activity {
     }
 
     private void setupWebView() {
+        // Enable debugging
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+
         WebSettings settings = webView.getSettings();
 
         // Enable JavaScript (required for PWA)
@@ -78,6 +85,11 @@ public class MainActivity extends Activity {
         // Enable geolocation
         settings.setGeolocationEnabled(true);
 
+        // Modern web app support
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(false);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+
         // Allow mixed content if needed
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
@@ -91,6 +103,10 @@ public class MainActivity extends Activity {
         // Allow file access for cached content
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
+
+        // Use wide viewport for responsive design
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
 
         // Handle navigation within WebView
         webView.setWebViewClient(new WebViewClient() {
@@ -142,6 +158,13 @@ public class MainActivity extends Activity {
                     GeolocationPermissions.Callback callback) {
                 // Auto-grant geolocation to the PWA
                 callback.invoke(origin, true, false);
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                Log.d("WeGlideCopilot", consoleMessage.message() + " -- line "
+                    + consoleMessage.lineNumber() + " of " + consoleMessage.sourceId());
+                return true;
             }
         });
     }
