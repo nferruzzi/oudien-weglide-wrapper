@@ -108,6 +108,10 @@ public class MainActivity extends Activity {
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
 
+        // Use Chrome mobile User-Agent
+        String userAgent = settings.getUserAgentString();
+        settings.setUserAgentString(userAgent.replace("; wv", ""));
+
         // Handle navigation within WebView
         webView.setWebViewClient(new WebViewClient() {
             @Override
