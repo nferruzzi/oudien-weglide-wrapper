@@ -27,5 +27,5 @@ android {
 }
 
 dependencies {
-    // No external dependencies needed
+    implementation("androidx.browser:browser:1.7.0")
 }
