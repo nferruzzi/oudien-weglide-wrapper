@@ -109,9 +109,17 @@ public class MainActivity extends Activity {
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
 
-        // Use Chrome mobile User-Agent
+        // Use Chrome mobile User-Agent (hide WebView marker)
         String userAgent = settings.getUserAgentString();
         settings.setUserAgentString(userAgent.replace("; wv", ""));
+
+        // Enable Service Worker support
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            android.webkit.ServiceWorkerController swController =
+                android.webkit.ServiceWorkerController.getInstance();
+            swController.getServiceWorkerWebSettings().setAllowContentAccess(true);
+            swController.getServiceWorkerWebSettings().setAllowFileAccess(true);
+        }
 
         // Handle navigation within WebView
         webView.setWebViewClient(new WebViewClient() {
@@ -133,6 +141,17 @@ public class MainActivity extends Activity {
                 super.onPageFinished(view, url);
                 loadingFinished = true;
                 Toast.makeText(MainActivity.this, "Caricato: " + url, Toast.LENGTH_LONG).show();
+
+                // Inject fallback for Service Worker if not supported
+                view.evaluateJavascript(
+                    "if (!('serviceWorker' in navigator)) { " +
+                    "  console.log('Service Worker not supported, using fallback'); " +
+                    "} else { " +
+                    "  navigator.serviceWorker.register('/service-worker.js').catch(function(e) { " +
+                    "    console.log('SW registration failed, continuing anyway: ' + e); " +
+                    "  }); " +
+                    "}",
+                    null);
             }
 
             @Override
